@@ -41,6 +41,7 @@ static int infactory_callback(bitbuffer_t *bitbuffer) {
     int humidity;
     int temp;
     float temp_f;
+    float temp_c;
 
     if (bitbuffer->bits_per_row[0] != 40) {
         return 0;
@@ -50,12 +51,14 @@ static int infactory_callback(bitbuffer_t *bitbuffer) {
     humidity = (b[3] & 0x0F) * 10 + (b[4] >> 4); // BCD
     temp = (b[2] << 4) | (b[3] >> 4);
     temp_f = (float)temp / 10 - 90;
+    temp_c = (temp_f - 32) * 5 / 9;
 
     local_time_str(0, time_str);
 
     data = data_make( "time",		"",				DATA_STRING,	time_str,
         "model",         "",	   DATA_STRING, "inFactory sensor",
         "id",      "ID",   DATA_FORMAT, "%u", DATA_INT, id,
+        "temperature_C", "Temperature",DATA_FORMAT, "%.02f °C", DATA_DOUBLE, temp_c,
         "temperature_F", "Temperature",DATA_FORMAT, "%.02f °F", DATA_DOUBLE, temp_f,
         "humidity",      "Humidity",   DATA_FORMAT, "%u %%", DATA_INT, humidity,
         NULL);
@@ -69,6 +72,7 @@ static char *output_fields[] = {
     "time",
     "model"
     "id",
+    "temperature_C",
     "temperature_F",
     "humidity",
     NULL
